@@ -1,0 +1,9 @@
+BestBuyAPI
+python-pushover~=0.4
+loguru~=0.5.3
+
+requests~=2.24.0
+
+selectorlib~=0.16.0
+
+pushbullet.py~=0.11.0

@@ -1,0 +1,13 @@
+{
+  "BestBuy": {
+    "6364259": {
+      "alert_price": 300.0,
+      "notified_on": "2020-10-12 16:53:30"
+    }
+  },
+  "Amazon": {
+    "https://www.amazon.com/dp/B07X4V2M3B/ref=twister_B08G2XBKS9?_encoding=UTF8&psc=1": {
+      "alert_price": 189.99
+    }
+  }
+}

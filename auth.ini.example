@@ -1,0 +1,16 @@
+[APIKeys]
+BestBuyAPIKey=
+gmailUsername=
+gmailPassword=
+
+[Alerts]
+pushoverUserKey=
+pushoverToken=
+
+pushBulletKey=
+pushBulletEncryptionPassword=
+
+webhook=
+
+smsNumber=
+smsCarrier=
