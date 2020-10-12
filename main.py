@@ -4,18 +4,18 @@ import requests
 from bestbuy import BestBuyAPI
 import json
 from configparser import ConfigParser
-from pushover import init, Client
 from loguru import logger
 
+from factories.Notification import Notification, Payload
 from utils.scraper import scrape
 from utils.sms import SMS
 from pushbullet import Pushbullet
 
 config = ConfigParser()
 config.read("auth.ini")
+disable_bestbuy = False
 if "APIKeys" not in config.sections():
-    logger.error("Missing APIKeys from auth.ini file. Exiting.")
-    exit(1)
+    disable_bestbuy = True
 
 with open("./items.json") as file:
     items = json.load(file)
@@ -28,57 +28,28 @@ def update_items_file(data):
 
 
 def send_alert(product_name, price, url=None, availability=None):
-    message = f"Name: {product_name}\n" \
-              f"Price: {price}"
-    title = "PRODUCT ON SALE!"
-    if availability:
-        message = message + f"\nAvailability: {availability}"
+    payload = Payload(name=product_name,
+                      price=price,
+                      url=url,
+                      availability=availability)
     if "Alerts" not in config.sections():
-        logger.info(f"{product_name} is priced at {price}")
-        if url:
-            logger.info(url)
+        logger.info(payload.generate_message())
         return
     if config.get('Alerts', 'pushoverToken', fallback=None) is not None and config.get('Alerts', 'pushoverUserKey', fallback=None) is not None:
-        init(config.get('Alerts', 'pushoverToken'))
-        pushover = Client(config.get('Alerts', 'pushoverUserKey'))
-        if url:
-            pushover.send_message(message, title=title, url_title="See Product", url=url)
-        else:
-            pushover.send_message(message, title=title)
+        Notification().send(payload, 'pushover')
     if config.get('Alerts', 'webhook', fallback=None) is not None:
+        Notification().send(payload, agent="webhook")
 
-        payload = {"name": product_name, "price": price, "url": url}
-        r = requests.post(config.get('Alerts', 'webhook'), data=payload)
-        if r.status_code != 200:
-            logger.error("Webhook responded with non 200 code!")
     if config.get('Alerts', 'pushBulletKey', fallback=None) is not None:
-        e2e_password = config.get('Alerts', 'pushBulletEncryptionPassword', fallback=None)
-        pb = Pushbullet(config.get('Alerts', 'pushBulletKey'), encryption_password=e2e_password)
-        if url:
-            pb.push_link(title=title, body=message, url=url)
-        else:
-            pb.push_note(title, message)
+        Notification().send(payload, agent="pushbullet")
 
-    phone_number = config.get('Alerts', 'smsNumber', fallback=None)
-    if phone_number is not None:
-        gmail_username = config.get('APIKeys', 'gmailUsername', fallback=None)
-        gmail_password = config.get('APIKeys', 'gmailUsername', fallback=None)
-        if gmail_password is None or gmail_username is None:
-            logger.error("Gmail username/password are not defined in auth.ini skipping SMS notification.")
-        else:
-            carrier = config.get('Alerts', 'smsCarrier', fallback="att")
-            message = "ITEM ON SALE\n" + message
-            if url:
-                message = message + f"\nURL: {url}"
-            sms = SMS(gmail_username, gmail_password)
-            sms.send(message=message,
-                     number=phone_number,
-                     carrier=carrier)
+    if config.get('Alerts', 'smsNumber', fallback=None) is not None:
+        Notification().send(payload, agent="sms")
 
 
 for store in items:
     product_ids = items[store].keys()
-    if store.lower() == "bestbuy":
+    if store.lower() == "bestbuy" and not disable_bestbuy:
         for sku in product_ids:
             bb = BestBuyAPI(config.get('APIKeys', 'BestBuyAPIKey'))
             product = bb.products.search_by_sku(sku=sku, format='json')
@@ -94,7 +65,14 @@ for store in items:
                 if inStoreAvailability is False and onlineAvailability is False:
                     continue
                 if price <= items[store][sku]['alert_price'] and 'notified_on' not in items[store][sku].keys():
-                    send_alert(product_name, price, url=url)
+                    availability = ""
+                    if inStoreAvailability:
+                        availability += "Available in Store"
+                    if onlineAvailability:
+                        if inStoreAvailability:
+                            availability += " and "
+                        availability += "Available Online"
+                    send_alert(product_name, price, url=url, availability=availability)
                     items[store][sku]['notified_on'] = (datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S')
                     update_items_file(items)
                 else:

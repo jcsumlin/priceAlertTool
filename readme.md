@@ -19,7 +19,8 @@ Currently this tool supports BestBuy and Amazon.
 ## How to use this tool
 1) Have python 3 installed.
 2) Clone this repo
-3) Configure which products you want to watch in the `items.json` file. For BestBuy we use the SKU to look up items using their free API. For Amazon we use the product code.
+3) Configure which products you want to watch in the `items.json` file. For BestBuy we use the SKU to look up items using their free API. For Amazon we use the url of the product page. `alert_price` should be a float.
+4) Rename `auth.ini.example` to `auth.ini` and fill out all the sections you want to enable then delete everything else. For example if you intend to just use this for Amazon price notifications you can remove the whole `[APIKeys]` section from this file. **WARNING**: DO NOT use quotation marks in the auth.ini file!
 
 ## FAQ:
 Q) Where can I find the SKU of a BestBuy Item?
@@ -34,3 +35,7 @@ A) alert_price is the the price you set to be alerted at. if the listing price i
 Q) Will I be alerted if my item is out of stock?
 
 A) You will not be alerted if your item is not available for purchase, but your mileage may vary with Amazon Products.
+
+Q) This thing isn't going to spam me with notifications is it?
+
+A) Nope! This tool is completely configurable in terms of notification frequency. in the `auth.ini` file you can specify `daysBetweenAlerts` inside the `[Alerts]` section (defaults to 1) to adjust how frequently you get notifications when a product is less than or equal to your alert_price

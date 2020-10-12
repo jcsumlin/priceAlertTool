@@ -1,7 +1,5 @@
 [APIKeys]
 BestBuyAPIKey=
-gmailUsername=
-gmailPassword=
 
 [Alerts]
 pushoverUserKey=
@@ -14,3 +12,5 @@ webhook=
 
 smsNumber=
 smsCarrier=
+
+daysBetweenAlerts=1
