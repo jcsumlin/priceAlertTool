@@ -23,6 +23,9 @@ class Payload(object):
                   f"Availability: {self.availability}\n" \
                   f"URL: {self.url}"
 
+    def toDict(self):
+        return {"name": self.name, "price": self.price, "url": self.url, "availability": self.availability}
+
 
 class Notification:
     def __init__(self):
@@ -55,8 +58,7 @@ class Notification:
             pushover.send_message(payload.generate_message(), title=self.title)
 
     def _send_webhook(self, payload):
-        payload = {"name": payload.name, "price": payload.price, "url": payload.url, "availability": payload.availability}
-        r = requests.post(config.get('Alerts', 'webhook'), data=payload)
+        r = requests.post(config.get('Alerts', 'webhook'), data=payload.toDict())
         if r.status_code != 200:
             logger.error("Webhook responded with non 200 code!")
 
