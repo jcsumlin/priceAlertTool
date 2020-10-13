@@ -4,6 +4,9 @@ name:
 price:
     css: '#price_inside_buybox'
     type: Text
+dealprice:
+    css: '#priceblock_dealprice'
+    type: Text
 short_description:
     css: '#featurebullets_feature_div'
     type: Text

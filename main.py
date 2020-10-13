@@ -96,7 +96,7 @@ for store in items:
             price = product['price']
             availability = product['availability']
             if price <= items[store][url]['alert_price'] and 'notified_on' not in items[store][url].keys():
-                send_alert(product_name, price, url=url)
+                send_alert(product_name, price, url=url, availability=availability)
                 items[store][url]['notified_on'] = (datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S')
                 update_items_file(items)
             else:

@@ -32,4 +32,6 @@ def scrape(url):
     results = e.extract(r.text)
     if results["price"] is not None:
         results["price"] = float(results['price'].replace("$", ""))
+    if results["dealprice"] is not None:
+        results["price"] = float(results['dealprice'].replace("$", ""))
     return results
