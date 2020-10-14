@@ -7,7 +7,7 @@ from configparser import ConfigParser
 from loguru import logger
 
 from factories.Notification import Notification, Payload
-from utils.scraper import scrape
+from utils.scraper import WebScraper
 from utils.sms import SMS
 from pushbullet import Pushbullet
 
@@ -82,11 +82,12 @@ for store in items:
                         if time_between_insertion.days >= DAYS_BETWEEN_ALERTS:
                             del items[store][sku]['notified_on']
                             update_items_file(items)
-    elif store.lower() == "amazon":
+    elif store.lower() == "amazon" or store.lower() == "microcenter":
+        scraper  = WebScraper(store.lower())
         for url in product_ids:
-            product = scrape(url)
+            product = scraper.scrape(url)
             if product is None:
-                logger.error("Bad response from Amazon!")
+                logger.error(f"Bad response from {store}!")
             # Check if product has a price and is in stock
             if type(product['price']) is not float:
                 continue

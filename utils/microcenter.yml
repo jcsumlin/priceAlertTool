@@ -1,0 +1,17 @@
+name:
+    css: 'title'
+    type: Text
+price:
+    css: '#pricing'
+    type: Text
+availability:
+    css: '.inventoryCnt'
+    type: Text
+images:
+    css: 'img.productImageZoom'
+    type: Attribute
+    attribute: src
+product_description:
+    css: '.features.inline p'
+    type: Text
+
