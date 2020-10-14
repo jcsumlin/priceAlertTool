@@ -1,6 +1,5 @@
 import datetime
 
-import requests
 from bestbuy import BestBuyAPI
 import json
 from configparser import ConfigParser
@@ -8,8 +7,6 @@ from loguru import logger
 
 from factories.Notification import Notification, Payload
 from utils.scraper import WebScraper
-from utils.sms import SMS
-from pushbullet import Pushbullet
 
 config = ConfigParser()
 config.read("auth.ini")
